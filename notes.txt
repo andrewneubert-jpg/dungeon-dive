@@ -1,0 +1,8 @@
+use the list of rooms to generate a line of rooms that you can navagate through
+print off the dungeon and destroy it??
+
+make the dungeon connections (east and west)
+already have the array of lists
+make starting room
+left and right will randomly pick off the list
+
