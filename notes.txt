@@ -20,4 +20,7 @@ print off info for rooms: room name, code, (it doesnt sat it in the rubric but I
 
 after printing off free everything
 
+ahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+
+
 
