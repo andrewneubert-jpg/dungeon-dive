@@ -8,13 +8,22 @@ typedef struct Room{ //making the structure
         char name[100];//probably gave a little bit more space than I need
         char id[50];
         char description[900];
-	struct Room *north;
-	struct Room *east;
-	struct Room *south;
-	struct Room *west;
+        struct Room *north;
+        struct Room *east;
+        struct Room *south;
+        struct Room *west;
 } Room;
 
-
+int roomCounter(int roomCount,char *lineB,FILE *lineP,int sizeLineB){
+ while(fgets(lineB,sizeLineB,lineP) != NULL){ //counts # of rooms
+        char splitBy[] = ":";
+        char *tok = strtok(lineB,splitBy);
+        if(strcmp("Room Name",tok)==0){
+        roomCount++;
+                }
+        }
+	return roomCount;
+}
 
 int main(int numFile, char **fileName){ //take in input from terminal
 
@@ -22,29 +31,19 @@ int main(int numFile, char **fileName){ //take in input from terminal
         int roomCount = 0;
         char lineB[900];
 
-        
-	
-	
-	while(fgets(lineB,sizeof(lineB),lineP) != NULL){ //counts # of rooms
-        char splitBy[] = ":";
-        char *tok = strtok(lineB,splitBy);
-        if(strcmp("Room Name",tok)==0){
-        roomCount++;
-                }
-        }
-
+	roomCount = roomCounter(roomCount,lineB,lineP,sizeof(lineB));
 
 
 
 
         rewind(lineP); //resets file line pointer, below is initial values
-        Room *room;	
+        Room *room;
         room = malloc(sizeof(Room)*(roomCount));
-        
+
         int count  = -1;
-	
-	
-	while(fgets(lineB,sizeof(lineB),lineP) != NULL){//reads line until end of file                        
+
+
+        while(fgets(lineB,sizeof(lineB),lineP) != NULL){//reads line until end of file
         char splitBy[] = ":";
         char *tok = strtok(lineB,splitBy);//splits the line by : to see what type of data it is
 
@@ -55,7 +54,7 @@ int main(int numFile, char **fileName){ //take in input from terminal
                 tok = strtok(tok,"\n");//takes away the \n at the end
                 tok++;//takes away the space at the front
                 count++;
-              
+
                 strcpy(room[count].name,tok);//adds room info to structure [rooms names seperated by the room count, that is how they are distinct structures]
                 }
         else if(strcmp("Room Code",tok)==0){
@@ -63,46 +62,46 @@ int main(int numFile, char **fileName){ //take in input from terminal
                 tok = strtok(tok, "\n");//same as above
                 tok++;
                 strcpy(room[count].id,tok);
-       		} 
+                }
         else if(strcmp("Room Description",tok)==0){
                 tok = strtok(NULL,splitBy);
                 tok = strtok(tok, "\n");
                 tok++;
                 strcpy(room[count].description,tok);
-             
-        	}
+
+                }
         }
-							
 
-		
-	char answer[50];
-	printf("\n\nhow many rooms in the dungeon do you want? ");
-	fgets(answer,sizeof(answer),stdin);
-	int numMake = atoi(answer);
-	printf("\n");
-	
-	Room *dungeonRoom;
-       	dungeonRoom = malloc(sizeof(Room)*numMake);	
 
-	srand(time(NULL));
-	for(int count = 0;count<numMake;count++){
-		int numChoice = (rand() % roomCount);
-		strcpy(dungeonRoom[count].id,room[numChoice].id);
-		strcpy(dungeonRoom[count].name,room[numChoice].name);
-		strcpy(dungeonRoom[count].description,room[numChoice].description);
-		if(count != 0){
-			dungeonRoom[count].west = &dungeonRoom[count-1];
-			dungeonRoom[count-1].east = &dungeonRoom[count];
-			printf("right of %s: %s\n", dungeonRoom[count-1].name,dungeonRoom[count-1].east->name);
-			printf("\ndungeon room %d: %s\n",count,dungeonRoom[count].name);
-			printf("left of %s: %s\n", dungeonRoom[count].name,dungeonRoom[count].west->name);
-		}
-		else{
-			printf("dungeon room %d: %s\n",count,dungeonRoom[count].name);
-		}
-	}
-	
-	
+
+        char answer[50];
+        printf("\n\nhow many rooms in the dungeon do you want? ");
+        fgets(answer,sizeof(answer),stdin);
+        int numMake = atoi(answer);
+        printf("\n");
+
+        Room *dungeonRoom;
+        dungeonRoom = malloc(sizeof(Room)*numMake);
+
+        srand(time(NULL));
+        for(int count = 0;count<numMake;count++){
+                int numChoice = (rand() % roomCount);
+                strcpy(dungeonRoom[count].id,room[numChoice].id);
+                strcpy(dungeonRoom[count].name,room[numChoice].name);
+                strcpy(dungeonRoom[count].description,room[numChoice].description);
+                if(count != 0){
+                        dungeonRoom[count].west = &dungeonRoom[count-1];
+                        dungeonRoom[count-1].east = &dungeonRoom[count];
+                        printf("right of %s: %s\n", dungeonRoom[count-1].name,dungeonRoom[count-1].east->name);
+                        printf("\ndungeon room %d: %s\n",count,dungeonRoom[count].name);
+                        printf("left of %s: %s\n", dungeonRoom[count].name,dungeonRoom[count].west->name);
+                }
+                else{
+                        printf("dungeon room %d: %s\n",count,dungeonRoom[count].name);
+                }
+        }
+
+
 
 
 
@@ -110,10 +109,9 @@ int main(int numFile, char **fileName){ //take in input from terminal
         //for(int count = 1; count < roomCount+1; count++){
         //      free(room[count]);
         //}
-	free(dungeonRoom);        
-	free(room);									
- 
+        free(dungeonRoom);
+        free(room);
+
 
 return 0;
 }
-
