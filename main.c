@@ -14,10 +14,10 @@ typedef struct Room{ //making the structure
         struct Room *west;
 } Room;
 
-int roomCounter(int roomCount, char *lineB, FILE *lineP, int sizeLineB){
+int roomCounter(int roomCount, char *lineB, FILE *lineP, int sizeLineB){ //in room manip
 	while(fgets(lineB,sizeLineB,lineP) != NULL){ //counts # of rooms
         	char splitBy[] = ":";
-        	char *tok = strtok(lineB,splitBy);
+        	char *tok = strtok(lineB,splitBy); //identifies each room by seeing how many lines include the phrase -Room name-
         		if(strcmp("Room Name",tok)==0){
         			roomCount++;
                 	}
@@ -25,29 +25,35 @@ int roomCounter(int roomCount, char *lineB, FILE *lineP, int sizeLineB){
 	return roomCount;
 }
 
-Room* roomMaker(char *lineB, int sizeLineB, FILE *lineP,Room *room, int count){
+char *stringTrimmer1(char *splitBy,char *tok, char *lineB){  //in string manip
+	tok = strtok(lineB,splitBy); //the first split, returns the string saying what type of info it it
+	return tok;
+}
+
+char *stringTrimmer2(char *splitBy,char *tok){  //in string manip
+	tok = strtok(NULL,splitBy); //cleans up the data
+	tok = strtok(tok,"\n");
+	tok++;
+	return tok;
+}
+
+
+Room* roomMaker(char *lineB, int sizeLineB, FILE *lineP,Room *room, int count){  //in room manip
 	while(fgets(lineB,sizeLineB,lineP) != NULL){//reads line until end of file
         	char splitBy[] = ":";
-        	char *tok = strtok(lineB,splitBy);//splits the line by : to see what type of data it is
+        	char *tok = stringTrimmer1(splitBy, tok, lineB);
 
         	if(strcmp("Room Name",tok)==0){//identifies the type of info
-                	tok = strtok(NULL,splitBy);// gets the second half of the line (type of info:info)
-                	tok = strtok(tok,"\n");//takes away the \n at the end
-               		tok++;//takes away the space at the front
+                	tok = stringTrimmer2(splitBy,tok);
                 	count++;
-
                 	strcpy(room[count].name,tok);//adds room info to structure [rooms names seperated by the room count, that is how they are distinct structures]
                 }
        		else if(strcmp("Room Code",tok)==0){
-                	tok = strtok(NULL,splitBy);
-               		tok = strtok(tok, "\n");//same as above
-                	tok++;
+                	tok = stringTrimmer2(splitBy,tok);
                 	strcpy(room[count].id,tok);
                 }
         	else if(strcmp("Room Description",tok)==0){
-                	tok = strtok(NULL,splitBy);
-                	tok = strtok(tok, "\n");
-                	tok++;
+                	tok = stringTrimmer2(splitBy,tok);
                 	strcpy(room[count].description,tok);
 
                 }
@@ -57,18 +63,20 @@ Room* roomMaker(char *lineB, int sizeLineB, FILE *lineP,Room *room, int count){
 }
 
 
-int question(){
- 	char answer[50];
+int question(){  //in room manip
+ 	char answer[50];//asks how many dungeons you want and returns an integer
         printf("\n\nhow many rooms in the dungeon do you want? ");
         fgets(answer,sizeof(answer),stdin);
         int numMake = atoi(answer);
         printf("\n");
 	return numMake;
 }
-Room* dungeonMaker(Room *dungeonRoom, Room *room, int roomCount, int numMake){
+
+
+Room* dungeonMaker(Room *dungeonRoom, Room *room, int roomCount, int numMake){ //in room manip
 
         srand(time(NULL));
-        for(int count = 0;count<numMake;count++){
+        for(int count = 0;count<numMake;count++){//randomly picks the room and assigns it to a new array
                 int numChoice = (rand() % roomCount);
                 strcpy(dungeonRoom[count].id,room[numChoice].id);
                 strcpy(dungeonRoom[count].name,room[numChoice].name);
@@ -81,7 +89,7 @@ Room* dungeonMaker(Room *dungeonRoom, Room *room, int roomCount, int numMake){
                         printf("left of %s: %s\n", dungeonRoom[count].name,dungeonRoom[count].west->name);
                 }
                 else{
-                        printf("dungeon room %d: %s <------ starting room\n",count,dungeonRoom[count].name);
+                        printf("dungeon room %d: %s <------ starting room\n",count,dungeonRoom[count].name);//I wanted it to print something slightly different for the first room (marking the first room)
                 }
         }
 	return dungeonRoom;
@@ -92,28 +100,25 @@ Room* dungeonMaker(Room *dungeonRoom, Room *room, int roomCount, int numMake){
 
 int main(int numFile, char **fileName){ //take in input from terminal
 
-        FILE *lineP = fopen(fileName[1],"r");                                                           //----------start of initial room array maker-------------
+	FILE *lineP = fopen(fileName[1],"r");                                                           //----------start of initial room array maker-------------
         int roomCount = 0;
         char lineB[900];
 
-	roomCount = roomCounter(roomCount,lineB,lineP,sizeof(lineB));
-
-
-
+        roomCount = roomCounter(roomCount,lineB,lineP,sizeof(lineB));
 
         rewind(lineP); //resets file line pointer, below is initial values
+
         Room *room;
         room = malloc(sizeof(Room)*(roomCount));
-
         int count  = -1;
-	
-	room = roomMaker(lineB, sizeof(lineB), lineP, room, count);
 
-	int numMake = question();
+        room = roomMaker(lineB, sizeof(lineB), lineP, room, count);
+
+        int numMake = question();
         Room *dungeonRoom;
         dungeonRoom = malloc(sizeof(Room)*numMake);
 
-	dungeonRoom = dungeonMaker(dungeonRoom, room, roomCount, numMake);
+        dungeonRoom = dungeonMaker(dungeonRoom, room, roomCount, numMake);
 
 
         fclose(lineP);//closes file
